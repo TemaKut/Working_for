@@ -1,19 +1,11 @@
-from rest_framework.viewsets import GenericViewSet
-from rest_framework import mixins
+from rest_framework.viewsets import ModelViewSet
 
 from users.models import User
 from .serializers import UserSerializer
 from .permissions import Can_Update_Info_About_Self
 
 
-class UserViewSet(
-                mixins.CreateModelMixin,
-                mixins.ListModelMixin,
-                mixins.RetrieveModelMixin,
-                mixins.DestroyModelMixin,
-                mixins.UpdateModelMixin,
-                GenericViewSet,
-        ):
+class UserViewSet(ModelViewSet):
     """
     Взаимодействие с пользователями:
 
@@ -22,6 +14,4 @@ class UserViewSet(
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [
-        Can_Update_Info_About_Self,
-    ]
+    permission_classes = [Can_Update_Info_About_Self]
