@@ -14,7 +14,7 @@ app_name = 'api_v1'
 
 router = SimpleRouter()
 
-router.register('users', views.UserViewSet, basename='GET_user')
+router.register('users', views.UserViewSet, basename='users')
 
 urlpatterns = [
     path('', include(router.urls)),
