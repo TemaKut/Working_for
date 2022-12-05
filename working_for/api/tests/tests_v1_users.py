@@ -33,6 +33,7 @@ class UsersTest(APITestCase):
         cls.employer_user_id = User.objects.get(username='employer').id
         cls.applicant_user_id = User.objects.get(username='applicant').id
 
+    # Тесты эндпоинта /api/v1/users/ (list and detail)
     def test_200_for_all_users_and_anonym_get_users_list(self):
         """ Анонимный пользователь и админ получают список пользователей. """
         request = self.admin.get(reverse('api_v1:users-list'))
@@ -199,3 +200,40 @@ class UsersTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data.get('results')), 3)
+
+    # Тесты эндпоинта /api/v1/users/me/ (Только GET запрос)
+    def test_admin_can_get_self_info(self):
+        """ Админ может получить информацию о себе. """
+        admin = User.objects.get(id=self.admin_user_id)
+
+        response = self.admin.get(reverse('api_v1:users_me'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(admin.id, response.data.get('id'))
+        self.assertEqual(admin.username, response.data.get('username'))
+        self.assertEqual(admin.password, response.data.get('password'))
+        self.assertEqual(admin.email, response.data.get('email'))
+
+    def test_employer_can_get_self_info(self):
+        """ Работодатель может получить информацию о себе. """
+        employer = User.objects.get(id=self.employer_user_id)
+
+        response = self.employer.get(reverse('api_v1:users_me'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(employer.id, response.data.get('id'))
+        self.assertEqual(employer.username, response.data.get('username'))
+        self.assertEqual(employer.password, response.data.get('password'))
+        self.assertEqual(employer.email, response.data.get('email'))
+
+    def test_applicant_can_get_self_info(self):
+        """ Соискатель может получить информацию о себе. """
+        applicant = User.objects.get(id=self.applicant_user_id)
+
+        response = self.applicant.get(reverse('api_v1:users_me'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(applicant.id, response.data.get('id'))
+        self.assertEqual(applicant.username, response.data.get('username'))
+        self.assertEqual(applicant.password, response.data.get('password'))
+        self.assertEqual(applicant.email, response.data.get('email'))

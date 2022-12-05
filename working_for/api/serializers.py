@@ -30,3 +30,17 @@ class UserSerializer(ModelSerializer):
                 'write_only': True,
                 },
         }
+
+
+class UserInfoAboutMeSerializer(ModelSerializer):
+    """ Показать информацию о себе. """
+
+    class Meta:
+        model = User
+        exclude = [
+            'is_staff',
+            'user_permissions',
+            'is_superuser',
+            'is_active',
+            'groups',
+        ]
