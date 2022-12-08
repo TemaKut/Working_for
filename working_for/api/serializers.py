@@ -15,18 +15,23 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-
-        exclude = [
-            'groups',
-            'user_permissions',
-            'is_superuser',
-            'is_staff',
-            'is_active',
+        fields = [
+            "id",
+            "last_login",
+            "username",
+            "first_name",
+            "last_name",
+            "date_joined",
+            "logo",
+            "email",
+            "password",
+            "role",
+            "location",
+            "is_blocked",
         ]
 
         extra_kwargs = {
             'password': {
-                'required': True,
                 'write_only': True,
                 },
         }
@@ -37,10 +42,17 @@ class UserInfoAboutMeSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        exclude = [
-            'is_staff',
-            'user_permissions',
-            'is_superuser',
-            'is_active',
-            'groups',
+        fields = [
+            "id",
+            "last_login",
+            "username",
+            "first_name",
+            "last_name",
+            "date_joined",
+            "logo",
+            "email",
+            "password",
+            "role",
+            "location",
+            "is_blocked",
         ]

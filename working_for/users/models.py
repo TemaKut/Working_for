@@ -15,12 +15,33 @@ USER_ROLES = (
 
 class User(AbstractUser):
     """ Переопределяем поля пользователя. """
-    logo = models.ImageField(blank=True, null=True)
-    email = models.EmailField(_("email address"), unique=True)
-    password = models.CharField(max_length=100, blank=True, null=True)
+    logo = models.ImageField(
+        'Аватар',
+        blank=True,
+        null=True,
+    )
+    email = models.EmailField(
+        _("email address"),
+        unique=True,
+    )
+    password = models.CharField(
+        'Пароль',
+        max_length=100,
+    )
     role = models.CharField(
-        "Роль", max_length=30,
-        choices=USER_ROLES, default=APPLICANT
+        "Роль",
+        max_length=30,
+        choices=USER_ROLES,
+        default=APPLICANT,
+    )
+    location = models.CharField(
+        'Местонахождение',
+        max_length=50,
+        blank=True,
+        null=True,
+    )
+    is_blocked = models.BooleanField(
+        default=False,
     )
 
     @property
