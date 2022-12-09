@@ -46,13 +46,12 @@ class Company(models.Model):
         unique=True,
     )
     is_blocked = models.BooleanField(
+        'Блокировка компании',
         default=False,
     )
     recruiters = models.ManyToManyField(
         User,
-        blank=True,
-        null=True,
-        verbose_name='recruiters',
+        verbose_name='Рекрутеры компании',
         related_name='companies',
     )
 

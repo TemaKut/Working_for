@@ -1,61 +1,63 @@
 from django.contrib.auth.hashers import make_password
 
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
-
+from companies.models import Company
 from users.models import User
 
 
-class UserSerializer(ModelSerializer):
-    """ Сераилизация модели пользователя. """
+class UserSerializer(serializers.ModelSerializer):
+    ' Сераилизация модели пользователя. '
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'last_login',
+            'username',
+            'first_name',
+            'last_name',
+            'date_joined',
+            'logo',
+            'email',
+            'password',
+            'role',
+            'location',
+            'companies',
+            'is_blocked',
+        ]
+        depth = 1
 
     def validate_password(self, value: str) -> str:
 
         return make_password(value)
 
-    class Meta:
-        model = User
-        fields = [
-            "id",
-            "last_login",
-            "username",
-            "first_name",
-            "last_name",
-            "date_joined",
-            "logo",
-            "email",
-            "password",
-            "role",
-            "location",
-            "companies",
-            "is_blocked",
-        ]
-        depth = 1
-        extra_kwargs = {
-            'password': {
-                'write_only': True,
-                },
-        }
 
+class CompanySerializer(serializers.ModelSerializer):
+    ' Сериализация модели компании. '
 
-class UserInfoAboutMeSerializer(ModelSerializer):
-    """ Показать информацию о себе. """
+    recruiters = serializers.SerializerMethodField(
+        'get_meta_serializing_recruiters'
+    )
 
     class Meta:
-        model = User
+        model = Company
         fields = [
-            "id",
-            "last_login",
-            "username",
-            "first_name",
-            "last_name",
-            "date_joined",
-            "logo",
-            "email",
-            "password",
-            "role",
-            "location",
-            "companies",
-            "is_blocked",
+            'id',
+            'name',
+            'logo',
+            'category',
+            'description',
+            'location',
+            'site',
+            'recruiters',
+            'is_blocked',
         ]
         depth = 1
+
+    def get_meta_serializing_recruiters(self, obj):
+        """ Сериализация вложенной модели пользователей. """
+        user_serializer = UserSerializer
+        user_serializer.Meta.depth = 0
+
+        return user_serializer(obj.recruiters.all(), many=True).data

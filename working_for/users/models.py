@@ -41,11 +41,13 @@ class User(AbstractUser):
         null=True,
     )
     is_blocked = models.BooleanField(
+        'Блокировка пользователя',
         default=False,
     )
 
     @property
     def is_admin(self):
+        """ Является ли пользователь представителем администрации. """
 
         return (
             ADMIN in self.role
@@ -55,11 +57,13 @@ class User(AbstractUser):
 
     @property
     def is_employer(self):
+        """ Является ли пользователь работодателем. """
 
         return EMPLOYER in self.role
 
     @property
     def is_applicant(self):
+        """ Является ли пользователь соискателем. """
 
         return APPLICANT in self.role
 
