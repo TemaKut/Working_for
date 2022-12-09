@@ -62,3 +62,8 @@ class User(AbstractUser):
     def is_applicant(self):
 
         return APPLICANT in self.role
+
+    def __str__(self):
+        """ Строчное представление. """
+
+        return self.username

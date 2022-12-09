@@ -27,9 +27,10 @@ class UserSerializer(ModelSerializer):
             "password",
             "role",
             "location",
+            "companies",
             "is_blocked",
         ]
-
+        depth = 1
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -54,5 +55,7 @@ class UserInfoAboutMeSerializer(ModelSerializer):
             "password",
             "role",
             "location",
+            "companies",
             "is_blocked",
         ]
+        depth = 1
