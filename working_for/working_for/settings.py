@@ -1,3 +1,5 @@
+import os
+
 from pathlib import Path
 from datetime import timedelta
 
@@ -102,11 +104,16 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_URL = '/media/'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
 CORS_ORIGIN_ALLOW_ALL = True
+
 CORS_URLS_REGEX = r'^/api/.*$'
 
 # Аутентификация по JWT токену

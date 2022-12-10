@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
 class CanUpdateInfoAboutSelf(BasePermission):
@@ -6,11 +6,13 @@ class CanUpdateInfoAboutSelf(BasePermission):
 
     def has_object_permission(self, request, view, obj):
 
-        return (
-            request.method in ['PATCH', 'PUT']
-            and request.user.id == obj.id
-            or request.user.is_admin
-        )
+        if request.method not in SAFE_METHODS:
+
+            return request.user.id == obj.id or request.user.is_admin
+
+        else:
+
+            return request.method in SAFE_METHODS
 
 
 class AdminOrEmployeeCanCreateOrUpdateCompany(BasePermission):

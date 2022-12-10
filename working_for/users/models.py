@@ -3,14 +3,15 @@ from django.utils.translation import gettext_lazy as _
 from django.db import models
 
 from . import constants
+from .source import get_upload_path
 
 
 class User(AbstractUser):
     """ Переопределяем поля пользователя. """
     logo = models.ImageField(
         'Аватар',
-        blank=True,
-        null=True,
+        upload_to=get_upload_path,
+        default='users/logo/default_logo/logo.jpg',
     )
     email = models.EmailField(
         _("email address"),
