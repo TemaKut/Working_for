@@ -7,7 +7,9 @@ from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    ' Сераилизация модели пользователя. '
+    """ Сераилизация модели пользователя. """
+
+    password = serializers.CharField(required=True, write_only=True)
 
     class Meta:
         model = User
@@ -23,7 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
             'password',
             'role',
             'location',
-            'companies',
+            'creator_of_the_company',
+            'recruiter_in',
             'is_blocked',
         ]
         depth = 1
@@ -34,8 +37,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
-    ' Сериализация модели компании. '
-
+    """ Сериализация модели компании. """
+    creator = UserSerializer(default=serializers.CurrentUserDefault())
     recruiters = serializers.SerializerMethodField(
         'get_meta_serializing_recruiters'
     )
@@ -50,6 +53,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'description',
             'location',
             'site',
+            'creator',
             'recruiters',
             'is_blocked',
         ]

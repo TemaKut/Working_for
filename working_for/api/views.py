@@ -9,7 +9,7 @@ from users.models import User
 from companies.models import Company
 
 from . import serializers
-from .permissions import Can_Update_Info_About_Self
+from . import permissions
 
 
 class UserViewSet(ModelViewSet):
@@ -17,7 +17,7 @@ class UserViewSet(ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = [Can_Update_Info_About_Self]
+    permission_classes = [permissions.CanUpdateInfoAboutSelf]
 
     @action(methods=['GET'], detail=False, url_path='me', url_name='me')
     def get_info_about_me(self, request):

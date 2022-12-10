@@ -2,14 +2,7 @@ from django.db import models
 
 from users.models import User
 
-
-CATEGORY_IT = 'it'
-CATEGORY_CATERING = 'catering'
-
-COMPANY_CATEGORIES = [
-    (CATEGORY_IT, 'IT'),
-    (CATEGORY_CATERING, 'Catering'),
-]
+from . import constants
 
 
 class Company(models.Model):
@@ -28,7 +21,7 @@ class Company(models.Model):
     category = models.CharField(
         'Категория компании',
         max_length=50,
-        choices=COMPANY_CATEGORIES,
+        choices=constants.COMPANY_CATEGORIES,
     )
     description = models.TextField(
         'Описание компании',
@@ -45,14 +38,22 @@ class Company(models.Model):
         null=True,
         unique=True,
     )
-    is_blocked = models.BooleanField(
-        'Блокировка компании',
-        default=False,
+    creator = models.OneToOneField(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name='Создатель компании',
+        related_name='creator_of_the_company',
     )
     recruiters = models.ManyToManyField(
         User,
         verbose_name='Рекрутеры компании',
-        related_name='companies',
+        related_name='recruiter_in',
+    )
+    is_blocked = models.BooleanField(
+        'Блокировка компании',
+        default=False,
     )
 
     def __str__(self):

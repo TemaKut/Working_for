@@ -1,0 +1,7 @@
+CATEGORY_IT = 'it'
+CATEGORY_CATERING = 'catering'
+
+COMPANY_CATEGORIES = [
+    (CATEGORY_IT, 'IT'),
+    (CATEGORY_CATERING, 'Catering'),
+]

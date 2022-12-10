@@ -2,15 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
-ADMIN = "admin"
-EMPLOYER = "employer"
-APPLICANT = "applicant"
-
-USER_ROLES = (
-    (ADMIN, "Administrator"),
-    (EMPLOYER, "Employer"),
-    (APPLICANT, "Applicant"),
-)
+from . import constants
 
 
 class User(AbstractUser):
@@ -31,8 +23,8 @@ class User(AbstractUser):
     role = models.CharField(
         "Роль",
         max_length=30,
-        choices=USER_ROLES,
-        default=APPLICANT,
+        choices=constants.USER_ROLES,
+        default=constants.APPLICANT,
     )
     location = models.CharField(
         'Местонахождение',
@@ -50,7 +42,7 @@ class User(AbstractUser):
         """ Является ли пользователь представителем администрации. """
 
         return (
-            ADMIN in self.role
+            constants.ADMIN in self.role
             or self.is_staff
             or self.is_superuser
         )
@@ -59,13 +51,13 @@ class User(AbstractUser):
     def is_employer(self):
         """ Является ли пользователь работодателем. """
 
-        return EMPLOYER in self.role
+        return constants.EMPLOYER in self.role
 
     @property
     def is_applicant(self):
         """ Является ли пользователь соискателем. """
 
-        return APPLICANT in self.role
+        return constants.APPLICANT in self.role
 
     def __str__(self):
         """ Строчное представление. """

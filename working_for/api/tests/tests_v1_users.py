@@ -35,30 +35,30 @@ class UsersTest(APITestCase):
 
     def test_200_for_all_users_and_anonym_get_users_list(self):
         """ Анонимный пользователь и админ получают список пользователей. """
-        request = self.admin.get(reverse('api_v1:users-list'))
+        response = self.admin.get(reverse('api_v1:users-list'))
         self.assertEqual(
-            request.status_code,
+            response.status_code,
             status.HTTP_200_OK,
             'У админа должен быть статус 200',
         )
 
-        request = self.employer.get(reverse('api_v1:users-list'))
+        response = self.employer.get(reverse('api_v1:users-list'))
         self.assertEqual(
-            request.status_code,
+            response.status_code,
             status.HTTP_200_OK,
             'У работодателя должен быть статус 200',
         )
 
-        request = self.applicant.get(reverse('api_v1:users-list'))
+        response = self.applicant.get(reverse('api_v1:users-list'))
         self.assertEqual(
-            request.status_code,
+            response.status_code,
             status.HTTP_200_OK,
             'У соискателя должен быть статус 200',
         )
 
-        request = self.client.get(reverse('api_v1:users-list'))
+        response = self.client.get(reverse('api_v1:users-list'))
         self.assertEqual(
-            request.status_code,
+            response.status_code,
             status.HTTP_200_OK,
             'У анонима должен быть статус 200',
         )
@@ -147,6 +147,104 @@ class UsersTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('first_name'), 'chenged_FN')
 
+    def test_pagination(self):
+        """ Работа паджинации. """
+        for i in range(30):
+            User.objects.create(
+                username=f'test_user_{i}',
+                password='12345678',
+                email=f'test_user_{i}@mail.ru',
+            ),
+
+        response = self.applicant.get(
+            reverse('api_v1:users-list') + '?offset=0'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get('results')), 15)
+
+        response = self.applicant.get(
+            reverse('api_v1:users-list') + '?offset=30'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get('results')), 3)
+
+    def test_admin_can_get_self_info(self):
+        """ Админ может получить информацию о себе. """
+        admin = User.objects.get(id=self.admin_user_id)
+
+        response = self.admin.get(reverse('api_v1:users-me'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(admin.id, response.data.get('id'))
+        self.assertEqual(admin.username, response.data.get('username'))
+        self.assertEqual(admin.email, response.data.get('email'))
+
+    def test_employer_can_get_self_info(self):
+        """ Работодатель может получить информацию о себе. """
+        employer = User.objects.get(id=self.employer_user_id)
+
+        response = self.employer.get(reverse('api_v1:users-me'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(employer.id, response.data.get('id'))
+        self.assertEqual(employer.username, response.data.get('username'))
+        self.assertEqual(employer.email, response.data.get('email'))
+
+    def test_applicant_can_get_self_info(self):
+        """ Соискатель может получить информацию о себе. """
+        applicant = User.objects.get(id=self.applicant_user_id)
+
+        response = self.applicant.get(reverse('api_v1:users-me'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(applicant.id, response.data.get('id'))
+        self.assertEqual(applicant.username, response.data.get('username'))
+        self.assertEqual(applicant.email, response.data.get('email'))
+
+    def test_structure_of_response_users_list(self):
+        """ Тест структуры ответа эндпоинта api_v1:users-list. """
+        response = self.admin.get(reverse('api_v1:users-list'))
+
+        EXPECTED_FIELDS = [
+            'id',
+            'last_login',
+            'username',
+            'first_name',
+            'last_name',
+            'date_joined',
+            'logo',
+            'email',
+            'role',
+            'location',
+            'creator_of_the_company',
+            'recruiter_in',
+            'is_blocked',
+        ]
+        for key in response.data.get('results')[0]:
+            self.assertIn(key, EXPECTED_FIELDS)
+
+    def test_structure_of_response_users_me(self):
+        """ Тест структуры ответа эндпоинта api_v1:users-me. """
+        response = self.admin.get(reverse('api_v1:users-me'))
+
+        EXPECTED_FIELDS = [
+            'id',
+            'last_login',
+            'username',
+            'first_name',
+            'last_name',
+            'date_joined',
+            'logo',
+            'email',
+            'role',
+            'location',
+            'creator_of_the_company',
+            'recruiter_in',
+            'is_blocked',
+        ]
+        for key in response.data:
+            self.assertIn(key, EXPECTED_FIELDS)
+
     def test_applicant_not_can_chenge_data_of_another_users(self):
         """ Соискатель не может менять информацию о других юзерах. """
         response = self.applicant.patch(
@@ -178,60 +276,3 @@ class UsersTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_paginations(self):
-        """ Работа паджинации. """
-        for i in range(30):
-            User.objects.create(
-                username=f'test_user_{i}',
-                password='12345678',
-                email=f'test_user_{i}@mail.ru',
-            ),
-
-        response = self.applicant.get(
-            reverse('api_v1:users-list') + '?offset=0'
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), 15)
-
-        response = self.applicant.get(
-            reverse('api_v1:users-list') + '?offset=30'
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), 3)
-
-    def test_admin_can_get_self_info(self):
-        """ Админ может получить информацию о себе. """
-        admin = User.objects.get(id=self.admin_user_id)
-
-        response = self.admin.get(reverse('api_v1:users-me'))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        self.assertEqual(admin.id, response.data.get('id'))
-        self.assertEqual(admin.username, response.data.get('username'))
-        self.assertEqual(admin.password, response.data.get('password'))
-        self.assertEqual(admin.email, response.data.get('email'))
-
-    def test_employer_can_get_self_info(self):
-        """ Работодатель может получить информацию о себе. """
-        employer = User.objects.get(id=self.employer_user_id)
-
-        response = self.employer.get(reverse('api_v1:users-me'))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        self.assertEqual(employer.id, response.data.get('id'))
-        self.assertEqual(employer.username, response.data.get('username'))
-        self.assertEqual(employer.password, response.data.get('password'))
-        self.assertEqual(employer.email, response.data.get('email'))
-
-    def test_applicant_can_get_self_info(self):
-        """ Соискатель может получить информацию о себе. """
-        applicant = User.objects.get(id=self.applicant_user_id)
-
-        response = self.applicant.get(reverse('api_v1:users-me'))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        self.assertEqual(applicant.id, response.data.get('id'))
-        self.assertEqual(applicant.username, response.data.get('username'))
-        self.assertEqual(applicant.password, response.data.get('password'))
-        self.assertEqual(applicant.email, response.data.get('email'))

@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission
 
 
-class Can_Update_Info_About_Self(BasePermission):
+class CanUpdateInfoAboutSelf(BasePermission):
     """ Допускается изменение информации о себе. """
 
     def has_object_permission(self, request, view, obj):
@@ -11,3 +11,10 @@ class Can_Update_Info_About_Self(BasePermission):
             and request.user.id == obj.id
             or request.user.is_admin
         )
+
+
+class AdminOrEmployeeCanCreateOrUpdateCompany(BasePermission):
+    """ Админ или работодатель могут создать или изменить данные компании. """
+
+    def has_permission(self, request, view):
+        pass
